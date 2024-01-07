@@ -7,7 +7,7 @@ const user = {
     id: '',
     name: '',
     avatar: '',
-    roles: [],
+    roleId: '',
     permissions: []
   },
 
@@ -24,8 +24,8 @@ const user = {
     SET_AVATAR: (state, avatar) => {
       state.avatar = avatar
     },
-    SET_ROLES: (state, roles) => {
-      state.roles = roles
+    SET_ROLEID: (state, roleId) => {
+      state.roleId = roleId
     },
     SET_PERMISSIONS: (state, permissions) => {
       state.permissions = permissions
@@ -54,13 +54,14 @@ const user = {
     GetInfo({ commit, state }) {
       return new Promise((resolve, reject) => {
         getInfo().then(res => {
+          console.log("GetInfo",res)
           const user = res.user
           const avatar = (user.avatar == "" || user.avatar == null) ? require("@/assets/images/profile.jpg") : process.env.VUE_APP_BASE_API + user.avatar;
-          if (res.roles && res.roles.length > 0) { // 验证返回的roles是否是一个非空数组
-            commit('SET_ROLES', res.roles)
-            commit('SET_PERMISSIONS', res.permissions)
+          if (res.roleId) { // 验证返回的roles是否是一个非空数组
+            commit('SET_ROLEID', res.roleId)
+            // commit('SET_PERMISSIONS', res.permissions)
           } else {
-            commit('SET_ROLES', ['ROLE_DEFAULT'])
+            commit('SET_ROLEID', 'ROLE_DEFAULT')
           }
           commit('SET_ID', user.userId)
           commit('SET_NAME', user.userName)
@@ -77,8 +78,8 @@ const user = {
       return new Promise((resolve, reject) => {
         logout(state.token).then(() => {
           commit('SET_TOKEN', '')
-          commit('SET_ROLES', [])
-          commit('SET_PERMISSIONS', [])
+          commit('SET_ROLEID', '')
+          // commit('SET_PERMISSIONS', [])
           removeToken()
           resolve()
         }).catch(error => {

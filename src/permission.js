@@ -11,6 +11,7 @@ NProgress.configure({ showSpinner: false })
 const whiteList = ['/login', '/register']
 
 router.beforeEach((to, from, next) => {
+  console.log("----------")
   NProgress.start()
   if (getToken()) {
     to.meta.title && store.dispatch('settings/setTitle', to.meta.title)
@@ -21,16 +22,16 @@ router.beforeEach((to, from, next) => {
     } else if (whiteList.indexOf(to.path) !== -1) {
       next()
     } else {
-      if (store.getters.roles.length === 0) {
+      if (store.getters.roleId) {
         isRelogin.show = true
         // 判断当前用户是否已拉取完user_info信息
         store.dispatch('GetInfo').then(() => {
           isRelogin.show = false
-          store.dispatch('GenerateRoutes').then(accessRoutes => {
-            // 根据roles权限生成可访问的路由表
-            router.addRoutes(accessRoutes) // 动态添加可访问路由表
-            next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
-          })
+          // store.dispatch('GenerateRoutes').then(accessRoutes => {
+          //   // 根据roles权限生成可访问的路由表
+          //   router.addRoutes(accessRoutes) // 动态添加可访问路由表
+          //   next({ ...to, replace: true }) // hack方法 确保addRoutes已完成
+          // })
         }).catch(err => {
             store.dispatch('LogOut').then(() => {
               Message.error(err)
